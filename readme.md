@@ -248,12 +248,6 @@ OverlayOBS/
 > *"Les overlays o2Cloud ont complètement transformé l'apparence de mon stream. Mes viewers adorent les animations fluides !"*
 > **- fabulousivan** (200 followers)
 
-### Événements et collaborations
-
-- **TwitchCon 2024** - Overlays officiels pour 12 streamers
-- **Gaming Convention** - Package corporate pour événement
-- **Charity Stream** - Design spécial pour collecte de fonds
-
 ## 🔗 Liens et ressources
 
 ### Communauté
