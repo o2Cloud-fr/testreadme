@@ -87,13 +87,13 @@ cd obs-overlays
 - Design cyberpunk avec effets néon
 - Couleurs : Cyan, magenta, néon vert
 - Animations : Glitch effects, pulsation
-- **Fichier** : `HUD/neon-hud/index.html`
+- **Fichier** : `HUD/Neon-Hud/index.html`
 
-- [ ] #### 🔥 Fire Gaming Overlay
+- [X] #### 🔥 Fire Gaming Overlay
 - Thème sombre avec accents rouges/oranges
 - Particules de feu animées
 - Compatible avec les jeux d'action
-- **Fichier** : `gaming/fire-overlay/index.html`
+- **Fichier** : `HUD/Fire-Overlay/index.html`
 
 - [ ] #### 💜 Gradient Gaming
 - Dégradés violets/roses modernes
