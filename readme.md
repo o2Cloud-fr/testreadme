@@ -99,7 +99,7 @@ cd obs-overlays
 - Dégradés violets/roses modernes
 - Glassmorphisme avancé
 - Parfait pour les jeux relaxants
-- **Fichier** : `gaming/gradient-gaming/index.html`
+- **Fichier** : `HUD/gradient-gaming/index.html`
 
 ### 📺 Collection Streaming
 
@@ -107,19 +107,19 @@ cd obs-overlays
 - Style cinématographique
 - Compte à rebours personnalisable
 - Bande-annonce de votre stream
-- **Fichier** : `streaming/cinematic-soon/index.html`
+- **Fichier** : `Streaming/cinematic-soon/index.html`
 
 - [ ] #### 🌙 Minimal BRB
 - Design épuré et élégant
 - Animations subtiles
 - Message personnalisable
-- **Fichier** : `streaming/minimal-brb/index.html`
+- **Fichier** : `Streaming/minimal-brb/index.html`
 
 - [ ] #### 🎉 Celebration End Screen
 - Écran de fin festif
 - Animations de confettis
 - Liens sociaux animés
-- **Fichier** : `streaming/celebration-end/index.html`
+- **Fichier** : `Streaming/celebration-end/index.html`
 
 - [ ] ### 🎵 Collection Audio
 
@@ -127,13 +127,13 @@ cd obs-overlays
 - Visualiseur d'ondes audio
 - Synchronisation avec la musique
 - Couleurs réactives au son
-- **Fichier** : `audio/wave-visualizer/index.html`
+- **Fichier** : `Audio/wave-visualizer/index.html`
 
 - [ ] #### 🔊 Now Playing Display
 - Affichage de la musique actuelle
 - Intégration Spotify/Apple Music
 - Pochette d'album animée
-- **Fichier** : `audio/now-playing/index.html`
+- **Fichier** : `Audio/now-playing/index.html`
 
 ## 🛠️ Développement et personnalisation
 
@@ -144,6 +144,11 @@ OverlayOBS/
 ├── LiveChat/
     ├── twitch_chat_1080p_o2Cloud.html
     ├── twitch_chat_o2Cloud.html
+├── HUD/
+   ├── Fire-Overlay/
+      ├── index.html
+   ├── Neon-Hud/
+      ├── index.html
 ```
 
 ### Technologies utilisées
