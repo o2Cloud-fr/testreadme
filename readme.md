@@ -83,11 +83,11 @@ cd obs-overlays
 
 ### 🌟 Collection Gaming
 
-- [ ] #### ⚡ Neon Gaming HUD
+- [X] #### ⚡ Neon Gaming HUD
 - Design cyberpunk avec effets néon
 - Couleurs : Cyan, magenta, néon vert
 - Animations : Glitch effects, pulsation
-- **Fichier** : `gaming/neon-hud/index.html`
+- **Fichier** : `HUD/neon-hud/index.html`
 
 - [ ] #### 🔥 Fire Gaming Overlay
 - Thème sombre avec accents rouges/oranges
