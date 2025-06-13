@@ -426,7 +426,7 @@ app.get('/', (req, res) => {
 // Démarrer le serveur
 app.listen(PORT, () => {
   console.log(`🌟 Serveur démarré sur http://localhost:${PORT}`);
-  console.log('📁 Interface web disponible à l\\'adresse ci-dessus');
+  console.log('📁 Interface web disponible à l\'adresse ci-dessus');
 });
 
 // Initialiser l'automation au démarrage si nécessaire
