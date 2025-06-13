@@ -102,8 +102,17 @@ async function performAutoCommit() {
     // Faire le commit
     await executeGitCommand(`git commit -m "${commitMessage}"`, config.repoPath);
     
-    // Push vers GitHub
-    await executeGitCommand('git push', config.repoPath);
+    // Push vers GitHub (set upstream if needed)
+    try {
+      await executeGitCommand('git push', config.repoPath);
+    } catch (pushError) {
+      if (pushError.message.includes('no upstream branch')) {
+        // Set upstream and push
+        await executeGitCommand('git push --set-upstream origin main', config.repoPath);
+      } else {
+        throw pushError;
+      }
+    }
     
     // Mettre à jour les statistiques
     config.lastCommit = new Date().toISOString();
@@ -121,7 +130,7 @@ let cronJob = null;
 
 function startAutomation() {
   if (cronJob) {
-    cronJob.destroy();
+    cronJob.stop();
   }
   
   // Exécuter toutes les heures à une minute aléatoire
@@ -138,7 +147,7 @@ function startAutomation() {
 
 function stopAutomation() {
   if (cronJob) {
-    cronJob.destroy();
+    cronJob.stop();
     cronJob = null;
   }
   console.log('⏸️ Automation arrêtée');
