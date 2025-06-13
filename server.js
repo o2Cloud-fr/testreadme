@@ -77,17 +77,28 @@ async function createDummyChanges(repoPath) {
 }
 
 // Fonction pour faire un commit automatique
+// Fonction pour faire un commit automatique (version corrigée)
 async function performAutoCommit() {
   try {
     console.log('🔄 Début du commit automatique...');
     
-    // Créer des changements
+    // Étape 1: Pull les derniers changements du remote
+    try {
+      console.log('📥 Récupération des derniers changements...');
+      await executeGitCommand('git pull origin main', config.repoPath);
+      console.log('✅ Changements récupérés avec succès');
+    } catch (pullError) {
+      console.log('⚠️ Avertissement lors du pull:', pullError.message);
+      // Continue même si le pull échoue (peut-être pas de remote changes)
+    }
+    
+    // Étape 2: Créer des changements
     await createDummyChanges(config.repoPath);
     
-    // Ajouter les fichiers
+    // Étape 3: Ajouter les fichiers
     await executeGitCommand('git add .', config.repoPath);
     
-    // Vérifier s'il y a des changements
+    // Étape 4: Vérifier s'il y a des changements
     const { stdout } = await executeGitCommand('git status --porcelain', config.repoPath);
     
     if (!stdout.trim()) {
@@ -95,36 +106,79 @@ async function performAutoCommit() {
       return;
     }
     
-    // Choisir un message de commit aléatoire
+    // Étape 5: Choisir un message de commit aléatoire
     const randomMessage = config.commitMessages[Math.floor(Math.random() * config.commitMessages.length)];
     const commitMessage = `${randomMessage} - ${new Date().toLocaleString()}`;
     
-    // Faire le commit
+    // Étape 6: Faire le commit
     await executeGitCommand(`git commit -m "${commitMessage}"`, config.repoPath);
+    console.log('✅ Commit local créé');
     
-    // Push vers GitHub (set upstream if needed)
+    // Étape 7: Push vers GitHub avec gestion des erreurs
     try {
-      await executeGitCommand('git push', config.repoPath);
+      console.log('📤 Push vers GitHub...');
+      await executeGitCommand('git push origin main', config.repoPath);
+      console.log('✅ Push réussi');
     } catch (pushError) {
+      console.log('⚠️ Première tentative de push échouée, essai avec upstream...');
+      
       if (pushError.message.includes('no upstream branch')) {
         // Set upstream and push
         await executeGitCommand('git push --set-upstream origin main', config.repoPath);
+        console.log('✅ Push avec upstream réussi');
+      } else if (pushError.message.includes('non-fast-forward') || pushError.message.includes('rejected')) {
+        // Le remote a des changements, on doit pull et retry
+        console.log('🔄 Détection de changements distants, nouvelle tentative...');
+        
+        try {
+          // Pull avec rebase pour éviter les merge commits
+          await executeGitCommand('git pull --rebase origin main', config.repoPath);
+          console.log('✅ Rebase réussi');
+          
+          // Retry push
+          await executeGitCommand('git push origin main', config.repoPath);
+          console.log('✅ Push après rebase réussi');
+        } catch (rebaseError) {
+          // Si le rebase échoue, on peut essayer un merge
+          console.log('⚠️ Rebase échoué, tentative avec merge...');
+          
+          try {
+            // Reset le rebase si nécessaire
+            await executeGitCommand('git rebase --abort', config.repoPath).catch(() => {});
+            
+            // Pull normal (avec merge)
+            await executeGitCommand('git pull origin main', config.repoPath);
+            console.log('✅ Merge réussi');
+            
+            // Retry push
+            await executeGitCommand('git push origin main', config.repoPath);
+            console.log('✅ Push après merge réussi');
+          } catch (finalError) {
+            throw new Error(`Impossible de synchroniser: ${finalError.message}`);
+          }
+        }
       } else {
         throw pushError;
       }
     }
     
-    // Mettre à jour les statistiques
+    // Étape 8: Mettre à jour les statistiques
     config.lastCommit = new Date().toISOString();
     config.commitCount++;
     
-    console.log(`✅ Commit réussi: ${commitMessage}`);
+    console.log(`✅ Commit automatique réussi: ${commitMessage}`);
     
   } catch (error) {
     console.error('❌ Erreur lors du commit automatique:', error.message);
+    
+    // Log plus détaillé pour le debug
+    console.error('📋 Détails de l\'erreur:', {
+      message: error.message,
+      code: error.code || 'N/A',
+      signal: error.signal || 'N/A'
+    });
   }
 }
-
 // Programmer les commits (toutes les heures avec variation aléatoire)
 let cronJob = null;
 
