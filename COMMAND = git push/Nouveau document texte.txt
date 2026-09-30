@@ -1,0 +1,78 @@
+Microsoft Windows [version 10.0.20348.5139]
+(c) Microsoft Corporation. Tous droits réservés.
+
+C:\Users\tech_admin>cd C:\AutoGit
+
+C:\AutoGit>git push
+To github.com:o2Cloud-fr/testreadme.git
+ ! [rejected]            main -> main (fetch first)
+error: failed to push some refs to 'github.com:o2Cloud-fr/testreadme.git'
+hint: Updates were rejected because the remote contains work that you do not
+hint: have locally. This is usually caused by another repository pushing to
+hint: the same ref. If you want to integrate the remote changes, use
+hint: 'git pull' before pushing again.
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+
+C:\AutoGit>rm .git/index
+'rm' n’est pas reconnu en tant que commande interne
+ou externe, un programme exécutable ou un fichier de commandes.
+
+C:\AutoGit>del .git/index
+Option non valide - "index".
+
+C:\AutoGit>del .git\index
+
+C:\AutoGit>git pull origin main --rebase
+remote: Enumerating objects: 5, done.
+remote: Counting objects: 100% (5/5), done.
+remote: Compressing objects: 100% (2/2), done.
+remote: Total 3 (delta 1), reused 3 (delta 1), pack-reused 0 (from 0)
+Unpacking objects: 100% (3/3), 394 bytes | 26.00 KiB/s, done.
+From github.com:o2Cloud-fr/testreadme
+ * branch                main       -> FETCH_HEAD
+   d0e3a6867..59117d6d6  main       -> origin/main
+Updating d0e3a6867..59117d6d6
+error: Your local changes to the following files would be overwritten by merge:
+        README.md
+Please commit your changes or stash them before you merge.
+Aborting
+
+C:\AutoGit>git push
+To github.com:o2Cloud-fr/testreadme.git
+ ! [rejected]            main -> main (non-fast-forward)
+error: failed to push some refs to 'github.com:o2Cloud-fr/testreadme.git'
+hint: Updates were rejected because the tip of your current branch is behind
+hint: its remote counterpart. If you want to integrate the remote changes,
+hint: use 'git pull' before pushing again.
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+
+C:\AutoGit>git stashgit pull origin main --rebasegit stash popgit add .
+
+C:\AutoGit>git stash
+No local changes to save
+
+C:\AutoGit>git pull origin main --rebase
+From github.com:o2Cloud-fr/testreadme
+ * branch                main       -> FETCH_HEAD
+Already up to date.
+
+C:\AutoGit>git stash pop
+No stash entries found.
+
+C:\AutoGit>git add .
+
+C:\AutoGit>git commit -m "gvn,j"
+On branch main
+Your branch is up to date with 'origin/main'.
+
+nothing to commit, working tree clean
+
+C:\AutoGit>git push
+Everything up-to-date
+
+C:\AutoGit>git checkout -- README.md
+
+C:\AutoGit>git push
+Everything up-to-date
+
+C:\AutoGit>
