@@ -1,0 +1,396 @@
+
+
+
+
+
+
+
+AutoGit
+
+Synchronisation automatique du dépôt Git avec GitHub.
+
+Dépôt distant :
+
+git@github.com:o2Cloud-fr/testreadme.git
+
+Branche principale :
+
+main
+⚠️ Procédure de récupération après coupure électrique
+
+Une coupure électrique pendant une opération Git peut interrompre l'écriture des références Git et provoquer notamment :
+
+fatal: You are not currently on a branch.
+fatal: failed to resolve HEAD as a valid ref
+fatal: bad object refs/heads/main
+fatal: bad object refs/remotes/origin/main
+
+ou :
+
+invalid sha1 pointer 0000000000000000000000000000000000000000
+
+Dans ce cas, ne pas supprimer le dossier .git et ne pas exécuter git init.
+
+Les commits peuvent toujours être présents dans la base d'objets Git et être récupérables avec :
+
+git fsck --full
+1. Se placer dans le dépôt
+
+Toujours utiliser /d avec cmd.exe si le lecteur peut être différent :
+
+cd /d C:\AutoGit
+
+Vérifier :
+
+git status
+2. Diagnostiquer le dépôt
+
+Exécuter :
+
+git fsck --full
+
+Si Git indique :
+
+invalid sha1 pointer 0000000000000000000000000000000000000000
+
+et affiche des lignes :
+
+dangling commit xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+les commits existent encore dans la base Git.
+
+Ne pas lancer :
+
+git gc
+git prune
+git reset --hard
+git init
+
+et surtout :
+
+git push --force
+3. Examiner les commits récupérables
+
+Pour chaque dangling commit trouvé par git fsck :
+
+git show --stat --oneline <COMMIT>
+
+Puis :
+
+git show -s --format="COMMIT=%H%nPARENT=%P%nDATE=%ci%nMESSAGE=%s" <COMMIT>
+
+Cela permet d'identifier le dernier commit valide.
+
+Exemple :
+
+git show -s --format="COMMIT=%H%nPARENT=%P%nDATE=%ci%nMESSAGE=%s" 2bf20f0f883a41ef2ac42b95a845e063d4321a3e
+4. Vérifier les références cassées
+
+Si :
+
+git branch -a
+
+affiche :
+
+fatal: failed to resolve HEAD as a valid ref
+
+ou :
+
+warning: ignoring broken ref refs/remotes/origin/main
+
+les références Git peuvent être corrompues.
+
+Les fichiers concernés sont généralement :
+
+.git\HEAD
+.git\refs\heads\main
+.git\refs\remotes\origin\main
+5. Restaurer HEAD
+
+Pour que HEAD pointe vers main :
+
+git symbolic-ref HEAD refs/heads/main
+6. Restaurer une branche main cassée
+
+Si :
+
+refs/heads/main: invalid sha1 pointer 0000000000000000000000000000000000000000
+
+supprimer uniquement la référence cassée :
+
+del ".git\refs\heads\main"
+
+Puis recréer main à partir du dernier commit valide :
+
+git update-ref refs/heads/main <COMMIT>
+
+Exemple :
+
+git update-ref refs/heads/main 2bf20f0f883a41ef2ac42b95a845e063d4321a3e
+
+Vérifier :
+
+git rev-parse main
+git status
+git branch -av
+7. Restaurer origin/main
+
+Si origin/main est cassé :
+
+refs/remotes/origin/main: invalid sha1 pointer
+
+supprimer uniquement la référence distante locale :
+
+del ".git\refs\remotes\origin\main"
+
+Puis récupérer à nouveau les références GitHub :
+
+git fetch origin
+
+Git doit normalement recréer :
+
+origin/main
+
+Vérifier :
+
+git branch -av
+8. Vérifier le dépôt GitHub AVANT de pousser
+
+Toujours exécuter :
+
+git ls-remote origin
+
+Puis :
+
+git branch -av
+
+Exemple :
+
+* main                ac2ac9863c
+  remotes/origin/main dd78870de9
+
+Ne jamais supposer que le dépôt local est identique au dépôt distant.
+
+9. Vérifier les différences d'historique
+
+Comparer les commits uniquement locaux :
+
+git log --oneline origin/main..main
+
+Comparer les commits uniquement sur GitHub :
+
+git log --oneline main..origin/main
+
+Comparer les fichiers :
+
+git diff --stat origin/main..main
+
+Pour voir toutes les différences :
+
+git diff origin/main..main
+10. Vérifier la structure des branches
+
+Utiliser :
+
+git log --oneline --decorate --graph --all -20
+
+Exemple :
+
+* ac2ac9863 (HEAD -> main) 📦 auto-sync: 1 file(s) updated
+* 8d16a0fa09 📝 auto-sync: 1 file(s) updated
+* f8b9bd35c8 🎯 auto-sync: 1 file(s) updated
+* 2bf20f0f88 🛠 auto-sync: 3 file(s) updated
+|
+* dd78870de9 (origin/main) 💡 auto-sync: 1 file(s) updated
+11. IMPORTANT : ne jamais utiliser push --force par réflexe
+
+Ne pas faire :
+
+git push --force
+
+ou :
+
+git push -f
+
+tant que l'historique GitHub n'a pas été vérifié.
+
+Un --force peut remplacer l'historique distant par l'historique local.
+
+12. Créer une sauvegarde avant une réparation complexe
+
+Avant toute opération importante :
+
+git branch backup-recovery
+
+Puis :
+
+git branch -av
+
+On peut également sauvegarder les références Git importantes :
+
+git show-ref > refs-backup.txt
+
+Et conserver le résultat de :
+
+git fsck --full > fsck-backup.txt
+13. Si le dépôt local et GitHub ont divergé
+
+Si Git affiche :
+
+[ahead X, behind Y]
+
+cela signifie que les historiques ne sont pas identiques.
+
+Exemple :
+
+main [ahead 4, behind 118680]
+
+Cela signifie :
+
+4 commits existent uniquement dans le dépôt local ;
+118680 commits existent uniquement dans le dépôt distant ;
+les deux branches partagent néanmoins un historique commun.
+
+Dans ce cas :
+
+NE PAS faire immédiatement :
+
+git push --force
+
+Il faut d'abord examiner :
+
+git log --oneline origin/main..main
+
+et :
+
+git log --oneline main..origin/main
+14. Si git pull indique "Already up to date"
+
+Il est possible que Git indique :
+
+Already up to date.
+
+alors que :
+
+git branch -av
+
+indique :
+
+[ahead X, behind Y]
+
+Dans cette situation, ne pas considérer automatiquement que le dépôt est synchronisé.
+
+Vérifier :
+
+git status
+git branch -av
+git log --oneline --decorate --graph --all -20
+git log --oneline origin/main..main
+git log --oneline main..origin/main
+git diff --stat origin/main..main
+15. Vérification finale
+
+Avant un push normal :
+
+git status
+
+Puis :
+
+git branch -av
+
+Puis :
+
+git log --oneline --decorate -10
+
+Puis :
+
+git ls-remote origin
+
+Enfin seulement :
+
+git push
+Commandes de diagnostic rapides
+
+En cas de nouveau problème :
+
+cd /d C:\AutoGit
+git status
+git fsck --full
+git branch -av
+git log --oneline --decorate --graph --all -20
+git remote -v
+git ls-remote origin
+Règles importantes
+Ne jamais supprimer .git
+
+Le dossier :
+
+C:\AutoGit\.git
+
+contient tout l'historique Git local.
+
+Ne jamais faire :
+
+rmdir /s /q .git
+
+sauf si la perte de l'historique local est volontaire.
+
+Ne jamais faire git init sur un dépôt existant
+
+Si le dépôt possède déjà :
+
+.git
+
+ne pas refaire :
+
+git init
+Ne pas utiliser git reset --hard pendant une récupération
+
+Cette commande peut supprimer les modifications présentes dans le répertoire de travail.
+
+Ne pas utiliser git push --force avant analyse
+
+Toujours vérifier origin/main avant.
+
+Résumé de récupération
+
+En cas de coupure électrique :
+
+cd /d C:\AutoGit
+git status
+git fsck --full
+
+Si des dangling commit apparaissent :
+
+git show -s --format="COMMIT=%H%nPARENT=%P%nDATE=%ci%nMESSAGE=%s" <COMMIT>
+
+Identifier le dernier commit valide.
+
+Si main est cassé :
+
+git symbolic-ref HEAD refs/heads/main
+del ".git\refs\heads\main"
+git update-ref refs/heads/main <COMMIT>
+
+Si origin/main est cassé :
+
+del ".git\refs\remotes\origin\main"
+git fetch origin
+
+Puis contrôler :
+
+git branch -av
+git log --oneline --decorate --graph --all -20
+git log --oneline origin/main..main
+git log --oneline main..origin/main
+
+Ne faire le git push qu'après vérification de l'historique local et distant.
+
+Dépôt
+Local :  C:\AutoGit
+Remote : git@github.com:o2Cloud-fr/testreadme.git
+Branch : main
+
+Dernière mise à jour de cette procédure :
+
+2026-09-30
